@@ -103,7 +103,7 @@ void setup() {
 }
 
 void loop() {
- 
+  if(BOOTSEL) doCalibrate();
   if(analog0.update() && enablePot0){
     MIDI.sendControlChange(controlNo1, map(analog0.getValue(),0, 4095,0,127), midiChannel);
     usbMIDI.sendControlChange(controlNo1, map(analog0.getValue(),0, 4095,0,127), midiChannel);
@@ -155,4 +155,14 @@ void loop() {
   }
   MIDI.read(); // read and discard any incoming MIDI messages
   usbMIDI.read();
+}
+
+void doCalibrate(){
+  for (int i = 0; i < touch_count; i++) {
+            digitalWrite(LED_BUILTIN, HIGH);
+            touches[i].recalibrate();
+          }
+          if(debug)Serial.println("Calibrated");
+          delay(1000);
+          digitalWrite(LED_BUILTIN, LOW);
 }

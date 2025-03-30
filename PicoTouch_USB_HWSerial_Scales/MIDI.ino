@@ -32,11 +32,8 @@ void handleControlChange(byte channel, byte number, byte value) {
 
       case 19:  //Recalibratie Touch pins
         if (value == 1 && calibrated == 0) {
-          for (int i = 0; i < touch_count; i++) {
-            digitalWrite(LED_BUILTIN, HIGH);
-            touches[i].recalibrate();
-          }
-          calibrated = 1;
+         doCalibrate();
+        calibrated = 1;
         }
         if (value == 0 && calibrated == 1) calibrated = 0;
         digitalWrite(LED_BUILTIN, LOW);
@@ -75,3 +72,5 @@ void handleControlChange(byte channel, byte number, byte value) {
     }
   }
 }
+
+
