@@ -129,6 +129,8 @@ void loop() {
       Serial.print("Pin pressed ");
       Serial.println( touches[i].pin );
       touch_velocity[i] = map (touches[i].raw_value - touch_threshold[i],1, 9000,1 ,127);
+      usbMIDI.sendAfterTouch(touch_velocity[i],midiChannel);
+
       Serial.println(touch_velocity[i]);
       }
       if(scale == 0){
