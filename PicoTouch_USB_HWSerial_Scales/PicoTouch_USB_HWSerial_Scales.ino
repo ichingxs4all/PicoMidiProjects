@@ -33,6 +33,8 @@ FilteredAnalog<12,      // Output precision in bits
 #include "TouchyTouch.h"
 
 const int touch_pins[] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 };
+int touch_velocity[] = { 100,100,100,100,100,100,100,100,100,100,100,100,100,100, 100,100,100,100,100,100,100};
+int touch_threshold[]={ 1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000, 1000,1000,1000,1000,1000,1000,1000};
 const int touch_count = sizeof(touch_pins) / sizeof(int);
 
 TouchyTouch touches[touch_count];
@@ -50,11 +52,11 @@ const uint16_t pentatonicTable[54] = { 0,1,3,6,8,10,13,15,18,20,22,25,27,30,32,3
 u_int8_t midiChannel = 1;  //The channel we send MIDI messages to
 const u_int8_t controlChannel = 16; //The MIDI channel we are listing on for commands
 
-const bool debug = false;
+const bool debug = true;
 
 u_int8_t transpose = 12;
 
-int scale = 0 ; //Defaults to chromatic ( 0), 1 = pentatonic
+int scale = 1 ; //Defaults to chromatic ( 0), 1 = pentatonic
 
 bool calibrated = 0;
 
@@ -62,9 +64,9 @@ int controlNo1 = 10;
 int controlNo2 = 11;
 int controlNo3 = 12;
 
-bool enablePot0 = true;
-bool enablePot1 = true;
-bool enablePot2 = true;
+bool enablePot0 = false;
+bool enablePot1 = false;
+bool enablePot2 = false;
 
 void setup() {
 
@@ -99,7 +101,10 @@ void setup() {
   for (int i = 0; i < touch_count; i++) {
     touches[i].begin( touch_pins[i] );
   }
+  delay(2000);
+  doCalibrate();
   calibrated = 1;
+  
 }
 
 void loop() {
@@ -123,15 +128,16 @@ void loop() {
       if(debug){
       Serial.print("Pin pressed ");
       Serial.println( touches[i].pin );
-      Serial.println( touches[i].raw_value );
+      touch_velocity[i] = map (touches[i].raw_value - touch_threshold[i],1, 9000,1 ,127);
+      Serial.println(touch_velocity[i]);
       }
       if(scale == 0){
-      MIDI.sendNoteOn(i+transpose, 100, midiChannel);
-      usbMIDI.sendNoteOn(i+transpose, 100, midiChannel);
+      MIDI.sendNoteOn(i+transpose, touch_velocity[i], midiChannel);
+      usbMIDI.sendNoteOn(i+transpose, touch_velocity[i], midiChannel);
       }
       if(scale == 1 ) {
-      MIDI.sendNoteOn(pentatonicTable[i+transpose], 100, midiChannel);
-      usbMIDI.sendNoteOn(pentatonicTable[i+transpose], 100, midiChannel);
+      MIDI.sendNoteOn(pentatonicTable[i+transpose], touch_velocity[i], midiChannel);
+      usbMIDI.sendNoteOn(pentatonicTable[i+transpose], touch_velocity[i], midiChannel);
       }
       digitalWrite(LED_BUILTIN, HIGH);
     }
@@ -142,12 +148,12 @@ void loop() {
       Serial.println( touches[i].pin );
       }
       if(scale == 0){
-      MIDI.sendNoteOff(i+transpose, 100, midiChannel);
-      usbMIDI.sendNoteOff(i+transpose, 100, midiChannel);
+      MIDI.sendNoteOff(i+transpose, 0, midiChannel);
+      usbMIDI.sendNoteOff(i+transpose, 0, midiChannel);
       }
       if(scale == 1){
-      MIDI.sendNoteOff(pentatonicTable[i+transpose], 100, midiChannel);
-      usbMIDI.sendNoteOff(pentatonicTable[i+transpose], 100, midiChannel);
+      MIDI.sendNoteOff(pentatonicTable[i+transpose], 0, midiChannel);
+      usbMIDI.sendNoteOff(pentatonicTable[i+transpose], 0, midiChannel);
       }
       digitalWrite(LED_BUILTIN, LOW);
     }
@@ -161,6 +167,8 @@ void doCalibrate(){
   for (int i = 0; i < touch_count; i++) {
             digitalWrite(LED_BUILTIN, HIGH);
             touches[i].recalibrate();
+            touch_threshold[i] = touches[i].threshold;
+            if(debug)Serial.println(touch_threshold[i]);
           }
           if(debug)Serial.println("Calibrated");
           delay(1000);

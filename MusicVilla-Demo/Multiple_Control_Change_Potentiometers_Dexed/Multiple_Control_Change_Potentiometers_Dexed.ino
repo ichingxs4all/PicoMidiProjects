@@ -58,7 +58,7 @@ CCPotentiometer potentiometers[] {
 
 void setup() {
    // Manually connect the MIDI interfaces to Control Surface
-  //Control_Surface | pipes | usbmidi;
+  Control_Surface | pipes | usbmidi;
   Control_Surface | pipes | serialmidi;
   Control_Surface.begin(); // Initialize Control Surface
 }
