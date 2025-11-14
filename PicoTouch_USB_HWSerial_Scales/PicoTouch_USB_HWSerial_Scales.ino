@@ -56,7 +56,7 @@ const bool debug = true;
 
 u_int8_t transpose = 12;
 
-int scale = 1 ; //Defaults to chromatic ( 0), 1 = pentatonic
+int scale = 0 ; //Defaults to chromatic ( 0), 1 = pentatonic
 
 bool calibrated = 0;
 
@@ -67,6 +67,8 @@ int controlNo3 = 12;
 bool enablePot0 = false;
 bool enablePot1 = false;
 bool enablePot2 = false;
+
+int lastAftertouch;
 
 void setup() {
 
@@ -124,7 +126,20 @@ void loop() {
 
   for ( int i = 0; i < touch_count; i++) {
     touches[i].update();
+    if(touches[i].touched()){
+      int touchval = touches[i].raw_value / 75;
+      if (touchval > 127) touchval = 127;
+      if (touchval!=lastAftertouch){
+      MIDI.sendAfterTouch(touchval,midiChannel);
+      usbMIDI.sendAfterTouch(touchval,midiChannel);
+      MIDI.sendControlChange(controlNo1, touchval, midiChannel);
+      usbMIDI.sendControlChange(controlNo1, touchval, midiChannel);
+      lastAftertouch = touchval;
+      delay(10);
+      }
+    }
     if ( touches[i].pressed() ) {
+      touch_velocity[i]= touches[i].raw_value - touches[i].threshold;
       if(debug){
       Serial.print("Pin pressed ");
       Serial.println( touches[i].pin );     
