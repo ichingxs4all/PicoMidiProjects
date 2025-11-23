@@ -6,13 +6,11 @@ void setupMIDI(){
 }
 
 void sendPGC(int number, int channel){
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("PGC on channel ");
-  lcd.print(channel);
-  lcd.setCursor(0,1);
-  lcd.print(number);
-  lcd.print(" sended");
+  doCalculation();
+
+  lcd.setCursor(15,1);
+  lcd.print("*");
+  
 
   if(debug){
   Serial.print(" Program change ");
@@ -21,11 +19,11 @@ void sendPGC(int number, int channel){
   Serial.println(channel);
   }
 
-
-  MIDI.sendProgramChange(number, channel);
-  usbMIDI.sendProgramChange(number, channel);
-  digit = 0;
+  MIDI.sendProgramChange(number-1, channel);
+  usbMIDI.sendProgramChange(number-1, channel);
   lastChannel=channel;
-  delay(2000);
+  lastPgNumber = number;
+
+  delay(200);
   enterMode();
 }
