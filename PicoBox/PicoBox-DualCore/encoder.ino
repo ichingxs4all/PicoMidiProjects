@@ -1,25 +1,39 @@
-void setupEncoder(){
-  pinMode(SW,INPUT_PULLUP);
+void setupEncoder() {
+  pinMode(SW, INPUT_PULLUP);
   encoder.begin();
   encoder.setMode(2);
 }
 
-void checkEncoder(){
-  pgnumber = 100 * number[0] + 10 * number[1] + number[2];
-  encoder.offset= pgnumber;
+void checkEncoder() {
   count = encoder.getCount();
-  if(count != prevCount) {
-    if(count > 127 ) count = 127;
-    if(count < 0 ) count = 0;
-    if(debug)Serial.println(count);
-    lcd.setCursor(0, 1);
-    lcd.print(count);
-    lcd.setCursor(0,1);
-    pgnumber = count;
+
+  if (count != prevCount) {
+  /**
+   * omdat we de count van de encoder niet kunnen zetten
+   * zijn we eigenlijk alleen geinteresseerd in of we rechtsom (count>prevCount)
+   * of linksom draaien.
+   */
+    if (count > prevCount) {
+      pgnumber++;
+    } else {
+      pgnumber--;
+    }
+    // clamp pgnumber tussen 0 en 127
+    pgnumber = min(127, max(pgnumber, 0));
+    if (debug) Serial.println(pgnumber);
+    
+    // functie in lcd om makkelijk een zeropadded nummer te maken. hand
+    printPadded(pgnumber);
+
     prevCount = count;
   }
- if(digitalRead(SW)==LOW){
-  pgnumber = count;
-  sendPGC(pgnumber, lastChannel);
- }
+}
+
+void checkSwitch() {
+  if (digitalRead(SW) == LOW) {
+    sendPGC(pgnumber, lastChannel);
+    MIDI.sendNoteOn(note, velocity, lastChannel);
+    delay(200);
+    MIDI.sendNoteOn(note, 0, lastChannel);
+  }
 }
