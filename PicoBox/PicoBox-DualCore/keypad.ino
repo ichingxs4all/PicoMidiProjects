@@ -51,30 +51,35 @@ void checkKeys2() {
         number[digit] = key - 48;
         lcd.print(number[digit]);
       }
-    }
-    if (e.bit.EVENT == KEY_JUST_RELEASED) {
-        digit++;
-        if (digit > 2) {
-          digit = 0;
-          lcd.setCursor(digit, 1);
-        }
+
+      switch (key) {
+        case 65:
+          sendPGC(pgnumber, chA);
+          break;
+        case 66:
+          sendPGC(pgnumber, chB);
+          break;
+        case 67:
+          sendPGC(pgnumber, chC);
+          break;
+        case 68:
+          sendPGC(pgnumber, chD);
+          break;
+        default:
+          break;
+      }
+      
     }
 
-    switch (key) {
-      case 65:
-        sendPGC(pgnumber, chA);
-        break;
-      case 66:
-        sendPGC(pgnumber, chB);
-        break;
-      case 67:
-        sendPGC(pgnumber, chC);
-        break;
-      case 68:
-        sendPGC(pgnumber, chD);
-        break;
-      default:
-        break;
+    if (e.bit.EVENT == KEY_JUST_RELEASED) {
+      digit++;
+      if (digit > 2) {
+        digit = 0;
+        lcd.setCursor(digit, 1);
+        pgnumber = 100 * number[0] + 10 * number[1] + number[2];
+        pgnumber = max(0, min(127, pgnumber));
+        printPadded(pgnumber);
+      }
     }
   }
   delay(20);

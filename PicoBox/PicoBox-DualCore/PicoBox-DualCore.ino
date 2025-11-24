@@ -29,6 +29,7 @@ MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 int number[] = { 0, 0, 0 };  //number buffer in digits
 int pgnumber = 1; //This will hold the actual program change number
 int lastPgNumber;
+char paddedPgNumber[5];
 
 const byte ROWS = 4;  // rows for the keypad
 const byte COLS = 4;  // columns for the keypad
