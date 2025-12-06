@@ -35,6 +35,7 @@ FilteredAnalog<12,      // Output precision in bits
 const int touch_pins[] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 };
 int touch_velocity[] = { 100,100,100,100,100,100,100,100,100,100,100,100,100,100, 100,100,100,100,100,100,100};
 int touch_threshold[]={ 1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000, 1000,1000,1000,1000,1000,1000,1000};
+
 const int touch_count = sizeof(touch_pins) / sizeof(int);
 
 TouchyTouch touches[touch_count];
@@ -155,6 +156,7 @@ void loop() {
       if (touchval > 127) touchval = 127;
       if (touchval!=lastAftertouch){
         if(aftEnable){
+          note = i+transpose;
           channel = midiChannelA;
       if (note > split-transpose) channel = midiChannelB;
       MIDI.sendAfterTouch(touchval,channel);
@@ -201,12 +203,12 @@ void loop() {
       if(scale == 1 && noteEnable) {
         if(debug) {
         Serial.print("Note On ");
-        Serial.print(note-transpose/2);
+        Serial.print(pentatonicTable[note]);
         Serial.print(" on channel ");
         Serial.println(channel);
         }
-      MIDI.sendNoteOn(pentatonicTable[note-(transpose/2)], touch_velocity[i], channel);
-      usbMIDI.sendNoteOn(pentatonicTable[note-(transpose/2)], touch_velocity[i], channel);
+      MIDI.sendNoteOn(pentatonicTable[note], touch_velocity[i], channel);
+      usbMIDI.sendNoteOn(pentatonicTable[note], touch_velocity[i], channel);
       }
       digitalWrite(LED_BUILTIN, HIGH);
     }
@@ -234,12 +236,12 @@ void loop() {
       if(scale == 1 && noteEnable){
         if(debug) {
         Serial.print("Note Off ");
-        Serial.print(note-transpose/2);
+        Serial.print(pentatonicTable[note]);
         Serial.print(" on channel ");
         Serial.println(channel);
         }
-      MIDI.sendNoteOff(pentatonicTable[note-(transpose/2)], 0, channel);
-      usbMIDI.sendNoteOff(pentatonicTable[note-(transpose/2)], 0, channel);
+      MIDI.sendNoteOff(pentatonicTable[note], 0, channel);
+      usbMIDI.sendNoteOff(pentatonicTable[note], 0, channel);
       }
       digitalWrite(LED_BUILTIN, LOW);
     }
