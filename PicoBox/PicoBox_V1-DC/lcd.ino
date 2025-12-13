@@ -3,6 +3,8 @@ void setupLCD() {
   lcd.backlight();
   lcd.clear();
   lcd.print("Pico MIDI Box V1");
+  lcd.setCursor(0, 1);
+  lcd.print("by Mies & Pet");
   delay(2000);
   lcd.clear();
   //lcd.blink_on();
