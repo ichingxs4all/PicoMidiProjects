@@ -58,10 +58,8 @@ void test_audio_in() {
 
 // -------------------------------------
 
- //#define LED_BUILTIN 3
 
 void setup() {
-
 #ifdef LED_BUILTIN
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, 1);
@@ -76,34 +74,33 @@ void setup() {
 #endif
 
   amy_config_t amy_config = amy_default_config();
-
   amy_config.features.startup_bleep = 1;
   // Install the default_synths on synths (MIDI chans) 1, 2, and 10 (this is the default).
   amy_config.features.default_synths = 1;
 
-  // Pins for i2s board
-  // Note: On the Teensy, all these settings are ignored, and blck = 21, lrc = 20, dout = 7.
-  amy_config.audio = AMY_AUDIO_IS_I2S;
-  amy_config.features.audio_in = 0;
-  //amy_config.i2s_mclk = 7;
-  amy_config.i2s_bclk = 20;
-  // On Pi Pico (RP2040, RP2350), i2s_lrc has to be i2s_bclk + 1, otherwise code will stop on an assert.
-  amy_config.i2s_lrc = 21;
-  amy_config.i2s_dout = 22;
-  //amy_config.i2s_din = 11;
-
   // If you want MIDI over UART (5-pin or 3-pin serial MIDI)
   amy_config.midi = AMY_MIDI_IS_UART;
+
+  // Pins for i2s board
+  // Note: On the Teensy, all these settings are ignored, and blck = 21, lrc = 20, dout = 7.
+  amy_config.i2s_mclk = 7;
+  amy_config.i2s_bclk = 8;
+  // On Pi Pico (RP2040, RP2350), i2s_lrc has to be i2s_bclk + 1, otherwise code will stop on an assert.
+  amy_config.i2s_lrc = 9;
+  amy_config.i2s_dout = 10;
+  amy_config.i2s_din = 11;
+
   // Pins for UART MIDI
   // Note: On the Teensy, these are ignored and midi_out = 35, midi_in = 34.
-  amy_config.midi_out = 1;
-  amy_config.midi_in = 2;
+  amy_config.midi_out = 4;
+  amy_config.midi_in = 5;
 
   amy_start(amy_config);
+  amy_live_start();
 
-  test_polyphony();
+  //test_polyphony();
   //test_sequencer();
-  //test_audio_in();
+  test_audio_in();
 }
 
 static long last_millis = 0;

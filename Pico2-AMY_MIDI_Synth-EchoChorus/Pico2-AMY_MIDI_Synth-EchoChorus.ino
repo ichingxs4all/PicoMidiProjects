@@ -61,7 +61,7 @@ void test_audio_in() {
 
 
 // -------------------------------------
-#define LED_BUILTIN 3
+//#define LED_BUILTIN 3
 
 void setup() {
 #ifdef LED_BUILTIN
